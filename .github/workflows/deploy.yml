@@ -2,34 +2,31 @@ name: Build & Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build Angular project
-        run: npm run build
+      - name: Build Angular
+        run: npm run build -- --configuration=production
 
       - name: Deploy to GitHub Pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm run ng -- deploy \
-            --repo=https://github.com/lupe2456/ng_test.git \
-            --name="lupe2456" \
-            --email="zrodriguez.esmeralda@gmail.com" \
-            --base-href=/ng_test/
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist/ng_test
+          token: ${{ secrets.GITHUB_TOKEN }}
+          clean: true
